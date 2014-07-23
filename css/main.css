@@ -14,3 +14,7 @@ body {
 .tableEven {
     background-color: gold;
 }
+
+table th {
+	padding-right: 16px;
+}
