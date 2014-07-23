@@ -1,6 +1,7 @@
 var http = require('http');
 var path = require('path');
 var fs = require('fs');
+var parseArgs = require('minimist');
  
 var extensions = {
     ".html" : "text/html",
@@ -57,5 +58,8 @@ function requestHandler(req, res) {
     var localFolder = __dirname;
     getFile(res, localFolder, path.dirname(req.url), fileName);
 };
+
+// Pull port from command line argument, if present
+port = parseArgs(process.argv.slice(2))['port'] || 80
  
-http.createServer(requestHandler).listen(80);
+http.createServer(requestHandler).listen(port);
