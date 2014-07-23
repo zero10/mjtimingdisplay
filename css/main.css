@@ -8,13 +8,3 @@ body {
 .gridStyle {
     border: 1px solid rgb(212,212,212);
 }
-.tableOdd {
-    background-color: green;
-}
-.tableEven {
-    background-color: gold;
-}
-
-table th {
-	padding-right: 16px;
-}

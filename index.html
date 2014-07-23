@@ -43,12 +43,12 @@
       <a href="index.html?SINGLE#11" class="btn btn-warning">RUNS</a>
     </div>
     <div class="resultsTable" ng-show="hasData()">
-      <table>
+      <table class="table table-striped">
         <thead>
           <tr><th>Position</th><th>Car #</th><th>Driver</th><th>Time</th></tr>
         </thead>
         <tbody>
-          <tr ng-repeat="result in data" ng-class="{tableEven: !($index%2), tableOdd: ($index%2)}">
+          <tr ng-repeat="result in data">
             <td>{{$index + 1}}</td><td>{{result.number}}</td><td>{{result.driver}}</td><td>{{result.time}}</td>
           </tr>
         </tbody>
