@@ -11,11 +11,12 @@ var extensions = {
     ".jpg" : "image/jpeg"
 };
  
-function getFile(res,localFolder,fileName){
+function getFile(res,localFolder,dirName,fileName){
     var ext = path.extname(fileName);
-    var filePath = localFolder + fileName;    
+    var filePath = localFolder + dirName + '/' + fileName;  
+	console.log('loading: ' + filePath); 
     if(!extensions[ext]){
-		fs.readFile(localFolder + 'notsupported.html',function(err,contents){
+		fs.readFile(localFolder + '/notsupported.html',function(err,contents){
             if(!err){
                 res.writeHead(404, {'Content-Type': 'text/html'});
                 res.end(contents);
@@ -39,7 +40,7 @@ function getFile(res,localFolder,fileName){
                 };
             });
         } else {
-            fs.readFile(page404,function(err,contents){
+            fs.readFile(localFolder + '/404.html',function(err,contents){
                 if(!err){
                     res.writeHead(404, {'Content-Type': 'text/html'});
                     res.end(contents);
@@ -53,9 +54,9 @@ function getFile(res,localFolder,fileName){
  
 function requestHandler(req, res) {
     var fileName = path.basename(req.url) || 'index.html';
-    var localFolder = __dirname + '/html/';
- 
-    getFile(res, localFolder, fileName);
+    if (fileName.toUpperCase() === 'APP.JS') { fileName = 'index.html';}
+    var localFolder = __dirname;
+    getFile(res, localFolder, path.dirname(req.url), fileName);
 };
  
 http.createServer(requestHandler).listen(80);
