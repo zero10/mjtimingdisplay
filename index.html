@@ -1,18 +1,63 @@
 <!doctype html>
-<html lang="en" ng-app="myApp">
+<html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
   <title>Scores</title>
   <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
   <link rel="stylesheet" href="css/main.css">
+  <script src="bower_components/jquery/jquery.js"></script>
   <script src="bower_components/angular/angular.min.js"></script>
+  <script src="bower_components/underscore/underscore.js"></script>
   <script src="js/main.js"></script>
 </head>
-<body>
-  <div ng-controller="appController">
-    <p>Welcome to the {{'scores' + '!'}}</p>
-    <br>
-    <p>{{text}}</p>
+  <body ng-app="myApp">
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Project name</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+    <div class="container"  ng-controller="appController">
+
+      <div class="starter-template">
+
+    <div class="btn-group">
+      <a href="index.html?PAX" class="btn btn-primary">PAX</a>
+      <a href="index.html?RAW" class="btn btn-info">RAW</a>
+      <a href="index.html?SINGLE#11" class="btn btn-warning">RUNS</a>
+    </div>
+    <div class="resultsTable" ng-show="hasData()">
+      <table>
+        <thead>
+          <tr><th>Position</th><th>Car #</th><th>Driver</th><th>Time</th></tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="result in data" ng-class="{tableEven: !($index%2), tableOdd: ($index%2)}">
+            <td>{{$index + 1}}</td><td>{{result.number}}</td><td>{{result.driver}}</td><td>{{result.time}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="noResults" ng-hide="hasData()">
+      No results!
+    </div>
   </div>
-</body>
+    </div>
+  </body>
 </html>
