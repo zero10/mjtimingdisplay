@@ -14,7 +14,6 @@ var extensions = {
 function getFile(res,localFolder,dirName,fileName){
     var ext = path.extname(fileName);
     var filePath = localFolder + dirName + '/' + fileName;  
-	console.log('loading: ' + filePath); 
     if(!extensions[ext]){
 		fs.readFile(localFolder + '/notsupported.html',function(err,contents){
             if(!err){
