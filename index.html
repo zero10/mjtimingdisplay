@@ -3,9 +3,9 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
   <title>Scores</title>
-  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/main.css">
-  <script src="bower_components/jquery/jquery.js"></script>
+  <script src="bower_components/jquery/jquery.min.js"></script>
   <script src="bower_components/angular/angular.min.js"></script>
   <script src="bower_components/underscore/underscore.js"></script>
   <script src="js/main.js"></script>
@@ -45,11 +45,18 @@
     <div class="resultsTable" ng-show="hasData()">
       <table class="table table-striped">
         <thead>
-          <tr><th>Position</th><th>Car #</th><th>Driver</th><th>Time</th></tr>
+          <tr>
+            <th class="text-right nowrap" style="width:1px;">Position</th>
+            <th class="text-center nowrap" style="width:1px;">Car #</th>
+            <th class="text-center nowrap">Driver</th>
+            <th class="text-right nowrap" style="width:1px;">Time</th></tr>
         </thead>
         <tbody>
-          <tr ng-repeat="result in data">
-            <td>{{$index + 1}}</td><td>{{result.number}}</td><td>{{result.driver}}</td><td>{{result.time}}</td>
+          <tr ng-repeat="result in data | orderBy : 'time'">
+            <td class="text-right nowrap">{{$index + 1}}</td>
+            <td class="text-center nowrap">{{result.number}}</td>
+            <td class="text-center nowrap">{{result.driver}}</td>
+            <td class="text-right nowrap">{{result.time | milliseconds}}</td>
           </tr>
         </tbody>
       </table>

@@ -1,6 +1,12 @@
 'use strict';
 
 angular.module('myApp', [])
+.filter('milliseconds', function() {
+  return function(value) {
+    var time = parseFloat(value) / 1000;
+    return time.toFixed(3);
+  };
+})
 .controller('appController', function ($scope, $http) {
   // on page load make the http request to get score data
   // process it - times should maybe be total in ms, we can use a formatter on them later
