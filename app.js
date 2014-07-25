@@ -44,8 +44,6 @@ var refreshScoreData = function() {
      parseScoreFiles(prefix);
    });
 };
-// Pull port from command line argument, if present
-port = parseArgs(process.argv.slice(2))['port'] || 80;
 
 router.use(function(req,res,next) {
   next();
@@ -67,5 +65,7 @@ var app = express();
 app.use("/lib", express.static(path.join(__dirname, 'bower_components')));
 app.use("/scores", router);
 app.use("/", express.static(path.join(__dirname,'public')));
-app.listen(port);
+
+// Pull port from command line argument, if present
+app.listen(parseArgs(process.argv.slice(2))['port'] || 80);
 refreshScoreData();
