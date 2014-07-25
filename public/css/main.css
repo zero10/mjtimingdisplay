@@ -8,3 +8,6 @@ body {
 .gridStyle {
     border: 1px solid rgb(212,212,212);
 }
+.nowrap {
+  white-space: nowrap;
+}

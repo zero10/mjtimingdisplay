@@ -33,17 +33,28 @@
       <table class="table table-striped">
         <thead>
           <tr>
-            <th class="text-right nowrap" style="width:1px;">Position</th>
+            <th class="text-right nowrap" style="width:1px;">Rank</th>
             <th class="text-center nowrap" style="width:1px;">Car #</th>
+            <th class="text-center nowrap" style="width:1px;">Mbr</th>
+            <th class="text-center nowrap" style="width:1px;">Rky</th>
+            <th class="text-center nowrap" style="width:1px;">Class</th>
             <th class="text-center nowrap">Driver</th>
-            <th class="text-right nowrap" style="width:1px;">Time</th></tr>
+            <th class="text-center nowrap">Car</th>
+            <th class="text-right nowrap" style="width:1px;">Time</th>
+            <th class="text-right nowrap" style="width:1px;">Score</th>
+          </tr>
         </thead>
         <tbody>
           <tr ng-repeat="result in data | orderBy : 'time'">
             <td class="text-right nowrap">{{$index + 1}}</td>
             <td class="text-center nowrap">{{result.number}}</td>
+            <td class="text-center nowrap">{{result.member | boolformatter}}</td>
+            <td class="text-center nowrap">{{result.rookie | boolformatter}}</td>
+            <td class="text-center nowrap">{{result.class}}</td>
             <td class="text-center nowrap">{{result.driver}}</td>
+            <td class="text-center nowrap">{{result.car}}</td>
             <td class="text-right nowrap">{{result.time | milliseconds}}</td>
+            <td class="text-right nowrap">{{result.score}}</td>
           </tr>
         </tbody>
       </table>
