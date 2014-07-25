@@ -7,7 +7,6 @@ var router = express.Router();
 var converter = require('csvtojson').core.Converter;
 
 var filePath = 'd:\\mjtiming\\mjtiming\\eventdata\\';
-var csvPath = filePath + 'test.csv';
 var scoreData = {};
 
 var addScores = function(scores, prefix) {

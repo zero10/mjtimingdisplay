@@ -14,15 +14,17 @@ angular.module('myApp', [])
   };
 })
 .controller('appController', function ($scope, $http) {
-  // on page load make the http request to get score data
-  // process it - times should maybe be total in ms, we can use a formatter on them later
-  // parse the query string to get raw/pax/runs, on runs use a hash fragment for one car only, otherwise full list
-  // helper buttons to strip the hash fragment and show all runs
   
-  // index.html should be preparing a bootstrap grid or something to put the data in instead of just a html table
-  // keep in mind it needs to keep each row grouped together when on wide and narrow displays
-  // we could collapse or remove some columns when viewed vertically, perhaps car could be removed for this view
+  $http({method: 'GET', url: '/scores/scorelist'})
+    .success(function(data, status, headers, config) {
+    $scope.dates = _.map(data, function(date) { return {date: date.Prefix, prefix: date.Prefix}; });
+    $scope.selectedDate = _.last($scope.dates);
+    $scope.dateSelected(); 
+  });
+  
   $scope.text = "Hello world!";
+  //todo: get the mode from the URL - empty = PAX?
+  $scope.mode = 'PAX';
   $scope.data = [
     { driver:"Bob2", number: 5, time: 99050, class: 'STF', car:'Some death trap',member:true,rookie:false},
     { driver:"Bob", number: 1, time: 91050, class:'SSM', car:'Another death trap',member:false,rookie:true},
@@ -31,5 +33,13 @@ angular.module('myApp', [])
   ];
   $scope.hasData = function() {
     return !_.isUndefined($scope.data) && $scope.data.length > 0;
+  };
+  $scope.dateSelected = function() {
+    if (!_.isUndefined($scope.selectedDate)) {
+      $http({method: 'GET', url: '/scores/scoresbyprefix?prefix='+$scope.selectedDate.prefix})
+      .success(function(data, status, headers, config) {
+        
+      });
+    }
   };
 });

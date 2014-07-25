@@ -24,11 +24,21 @@
 
       <div class="starter-template">
 
-    <div class="btn-group">
-      <a href="index.html?PAX" class="btn btn-primary">PAX</a>
-      <a href="index.html?RAW" class="btn btn-info">RAW</a>
-      <a href="index.html?SINGLE#11" class="btn btn-warning">Runs</a>
+    <div class="btn-group nowrap">
+      <a href="#PAX" class="btn btn-primary" ng-click="mode = 'PAX'">PAX</a>
+      <a href="#RAW" class="btn btn-info" ng-click="mode = 'RAW'">RAW</a>
+      <a href="#SINGLE/11" class="btn btn-warning" ng-click="mode = 'Runs'">Runs</a>
     </div>
+
+    <h1 ng-show="mode">{{ mode }}</h1>
+
+      <div class="dateSelectClass">
+        <span ng-hide="dates && dates.length > 0">No Results</span>
+        <select ng-model="selectedDate" ng-options="date.date for date in dates" ng-show="dates && dates.length > 0" class="form-control" ng-change="dateSelected()">
+        </select>
+      </div>
+
+
     <div class="resultsTable" ng-show="hasData()">
       <table class="table table-striped">
         <thead>
