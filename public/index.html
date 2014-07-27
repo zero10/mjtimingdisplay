@@ -22,15 +22,17 @@
 
     <div class="container"  ng-controller="appController">
 
-      <div class="starter-template">
+  <div ng-show="loading">
+    <h1>Loading...</h1>
+  </div>
 
-    <div class="btn-group nowrap">
+      <div class="starter-template" ng-hide="loading">
+
+    <div class="btn-group nowrap" style="padding-bottom:10px;">
       <a href="#PAX" class="btn btn-primary" ng-click="mode = 'PAX'">PAX</a>
       <a href="#RAW" class="btn btn-info" ng-click="mode = 'RAW'">RAW</a>
-      <a href="#SINGLE/11" class="btn btn-warning" ng-click="mode = 'Runs'">Runs</a>
+      <a href="#RUNS" class="btn btn-warning" ng-click="mode = 'RUNS'">Runs</a>
     </div>
-
-    <h1 ng-show="mode">{{ mode }}</h1>
 
       <div class="dateSelectClass">
         <span ng-hide="dates && dates.length > 0">No Results</span>
@@ -39,7 +41,8 @@
       </div>
 
 
-    <div class="resultsTable" ng-show="hasData()">
+    <div class="resultsArea" ng-show="hasData()">
+    <div class="rawResultsTable" ng-show="mode === 'RAW'">
       <table class="table table-striped">
         <thead>
           <tr>
@@ -55,7 +58,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="result in data | orderBy : 'time'">
+          <tr ng-repeat="result in results | orderBy : 'rawTime'">
             <td class="text-right nowrap">{{$index + 1}}</td>
             <td class="text-center nowrap">{{result.number}}</td>
             <td class="text-center nowrap">{{result.member}}</td>
@@ -63,15 +66,58 @@
             <td class="text-center nowrap">{{result.class}}</td>
             <td class="text-center nowrap">{{result.driver}}</td>
             <td class="text-center nowrap">{{result.car}}</td>
-            <td class="text-right nowrap">{{result.time | formatruntime}}</td>
+            <td class="text-right nowrap">{{result.rawTime | formatruntime}}</td>
             <td class="text-right nowrap">{{result.score}}</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="noResults" ng-hide="hasData()">
-      No results!
+    <div class="paxResultsTable" ng-show="mode === 'PAX'">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th class="text-right nowrap" style="width:1px;">Rank</th>
+            <th class="text-center nowrap" style="width:1px;">Car #</th>
+            <th class="text-center nowrap" style="width:1px;">Mbr</th>
+            <th class="text-center nowrap" style="width:1px;">Rky</th>
+            <th class="text-center nowrap" style="width:1px;">Class</th>
+            <th class="text-center nowrap">Driver</th>
+            <th class="text-center nowrap">Car</th>
+            <th class="text-right nowrap" style="width:1px;">PAX</th>
+            <th class="text-right nowrap" style="width:1px;">Time</th>
+            <th class="text-right nowrap" style="width:1px;">Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="result in results | orderBy : 'paxTime'">
+            <td class="text-right nowrap">{{$index + 1}}</td>
+            <td class="text-center nowrap">{{result.number}}</td>
+            <td class="text-center nowrap">{{result.member}}</td>
+            <td class="text-center nowrap">{{result.rookie}}</td>
+            <td class="text-center nowrap">{{result.class}}</td>
+            <td class="text-center nowrap">{{result.driver}}</td>
+            <td class="text-center nowrap">{{result.car}}</td>
+            <td class="text-right nowrap">{{result.pax}}</td>
+            <td class="text-right nowrap">{{result.paxTime | formatruntime}}</td>
+            <td class="text-right nowrap">{{result.score}}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+    <div class="paxResultsTable" ng-show="mode === 'RUNS'">
+      <h1>RUNS</h1>
+      <table>
+        <tbody>
+          <tr ng-repeat="driver in results | orderBy : 'number'">
+            <td>{{driver.number}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="noResults" style="padding-top: 10px;" ng-hide="hasData()">
+    <h1>No results!</h1>
+  </div>
   </div>
     </div>
   </body>

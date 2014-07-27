@@ -1,44 +1,98 @@
 'use strict';
+// pretty much stolen wholesale from jQuery, except we're using underscore's isArray method instead of theirs
+var isNumeric = function( obj ) {
+  return !_.isArray( obj ) && obj - parseFloat( obj ) >= 0;
+};
 
 angular.module('myApp', [])
 .filter('formatruntime', function() {
   // might be a number or DNS?
   return function(value) {
+    if (!isNumeric(value)) { return value; }
     var time = parseFloat(value) / 1000;
     return time.toFixed(3);
   };
 })
-.controller('appController', function ($scope, $http, $location) {
+.controller('appController', function ($scope, $http, $location, $q) {
+  $scope.mode = 'PAX';
+  $scope.loading = true;
+  $scope.paxCones = false;
+  $scope.paxValues = {};
   
+  var findPax = function(carClass) {
+    if (_.isUndefined($scope.paxValues[carClass])) {
+      return 1.000;
+    }
+    return $scope.paxValues[carClass].pax;
+  };
   var padLeft = function(inString) {
     var pad = "00";
     var str = "";
-    if (!_.isUndefined(inString)) { str +=  inString; }
+    if (!_.isUndefined(inString)) { str += inString; }
     return pad.substring(0, pad.length - str.length) + str;
+  };
+  var validRuns = function(run, day) {
+    return ((_.isUndefined(run.penalty) || '' === run.penalty || isNumeric(run.penalty)) && 
+      day === run.day);
   };
   // need function to filter to valid runs
   // check for DNF/RRN 
+  var getFtdForDay = function(runs, day) {
+    return _.chain(runs)
+      .filter(function(run) { return validRuns(run, day);})
+      .map(function(run) {
+        var penalty = run.penalty || 0;
+        return (run.time*1000) + (penalty*2000); 
+      })
+      .sort()
+      .first()
+      .value(); 
+  };
+  var getTime = function(times) {
+    var time = 0;
+    var hasTime = true;
+    _.each($scope.days, function(day) {
+      var dayTime = times[day];
+      if (_.isUndefined(dayTime)) {
+        hasTime = false;;
+      } else {
+        time += dayTime;
+      }
+    });
+    if (hasTime) {
+      return time;
+    } else {
+      return 'DNS';
+    }
+  };
   var mapRunsToDriver = function(driver, runData) {
-    var fastestRun1 = _.first(_.sortBy(_.filter(runData[driver.number], function(run) { return run.day === 1;}), function(run) { return run.time; }));
-    var fastestRun2 = _.first(_.sortBy(_.filter(runData[driver.number], function(run) { return run.day === 2;}), function(run) { return run.time; }));
-    var ftd1 = fastestRun1 ? fastestRun1.time * 1000 : 0;
-    var ftd2 = fastestRun2 ? fastestRun2.time * 1000 : 0;
-    return {
-      driver: driver.name,
+    var times = _.object(_.map($scope.days, function(day) { return [day, getFtdForDay(runData[driver.number], day)];}));
+    var driver = {
+      driver: driver.driver,
       number: driver.number,
       class: driver.class,
       car: driver.car,
       member: driver.member,
       rookie: driver.rookie,
-      ftd1: ftd1,
-      ftd2: ftd2,
-      time: ftd1 + ftd2
+      runs: runData[driver.number],
+      rawTime: getTime(times),
+      paxTime: getTime(times) * findPax(driver.class),
+      pax: findPax(driver.class)
     };
+    return driver;
   };
   
-  $http({method: 'GET', url: '/scores/scorelist'})
-    .success(function(data, status, headers, config) {
-    $scope.dates = _.sortBy(data, function(date) { return date.Prefix; });
+  var getPrefixes = $http({method: 'GET', url: '/scores/scorelist'});
+  var getConfig = $http({method: 'GET', url: '/config/configdata'});
+  var getPax = $http({method: 'GET', url: '/config/paxvalues'});
+  $q.all([getPrefixes, getConfig, getPax]).then(function(data) {
+    // parse configdata
+    if (data[1].data.paxCones.toUpperCase() === 'YES') { $scope.paxCones = true; }
+    else { $scope.paxCones = false; }
+    // parse paxvalues
+    $scope.paxValues = data[2].data;
+    // parse prefixes
+    $scope.dates = _.sortBy(data[0].data, function(date) { return date.Prefix; });
     var d = new Date();
     var dateString = d.getFullYear() + '_' + padLeft(d.getMonth() + 1) + '_' + padLeft(d.getDate());
     _.each($scope.dates, function(date) {
@@ -50,27 +104,36 @@ angular.module('myApp', [])
     if (_.isUndefined($scope.selectedDate)) {
       $scope.selectedDate = _.last($scope.dates);
     }
-    $scope.dateSelected(); 
+    $scope.dateSelected();
+    
+    $scope.loading = false;
   });
   
-  $scope.mode = 'PAX';
   $scope.hasData = function() {
-    return !_.isUndefined($scope.data) && $scope.data.length > 0;
+    return !_.isUndefined($scope.results) && $scope.results.length > 0;
   };
   $scope.dateSelected = function() {
     if (!_.isUndefined($scope.selectedDate)) {
       $http({method: 'GET', url: '/scores/scoresbyprefix?prefix='+$scope.selectedDate.Prefix})
       .success(function(data, status, headers, config) {
-        // turn the runs data into something we can quickly index into
+        var days = [];
         var processedRuns = {};
         _.each(data.Runs, function(run) {
           if (_.isUndefined(processedRuns[run.number])) {
             processedRuns[run.number] = [];
           }
           processedRuns[run.number].push(run);
+          if (days.indexOf(run.day) === -1) {
+            days.push(run.day);
+          }
         });
-        // add a layer of filtering - only include drivers with runs
-        $scope.data = _.map(data.Drivers, function(driver) { return mapRunsToDriver(driver, processedRuns); });
+        $scope.days = days;
+        // only include drivers with runs
+        $scope.results = _.map(_.filter(data.Drivers, function(driver) {
+            return (!_.isUndefined(processedRuns[driver.number]));
+          }), function(driver) { 
+            return mapRunsToDriver(driver, processedRuns); 
+          });
       });
     }
   };
